@@ -25,51 +25,49 @@ SOFTWARE.
 package main
 
 import (
-  "fmt"
-  "github.com/spf13/viper"
-  "log"
-  "net/url"
-  "net/http"
-  "io/ioutil"
-  "flag"
+	"flag"
+	"fmt"
+	"github.com/spf13/viper"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
 )
 
 const (
-  base_url = "https://sms.ru/sms/send"
+	base_url = "https://sms.ru/sms/send"
 )
 
-func readConfig(filename string) (string, string){
-  viper.SetConfigName(filename)
-  viper.AddConfigPath(".")
-  viper.SetConfigType("yaml")
-  err := viper.ReadInConfig()
-  if err != nil {
-    log.Fatal("Config file not found")
-  }
-  api_id := viper.GetString("auth.api_id")
-  to := viper.GetString("auth.to")
-  return api_id, to
+func readConfig(filename string) (string, string) {
+	viper.SetConfigName(filename)
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal("Config file not found")
+	}
+	api_id := viper.GetString("auth.api_id")
+	to := viper.GetString("auth.to")
+	return api_id, to
 }
 
 func sendSms(msg string) {
-  api_id, to := readConfig("gosmsru")
-  req, err := http.PostForm(base_url, url.Values{
-    "api_id": {api_id},
-    "to": {to},
-    "json": {"1"},
-    "msg": {msg}})
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer req.Body.Close()
-  resp, _ := ioutil.ReadAll(req.Body)
-  fmt.Println(string(resp))
+	api_id, to := readConfig("gosmsru")
+	req, err := http.PostForm(base_url, url.Values{
+		"api_id": {api_id},
+		"to":     {to},
+		"json":   {"1"},
+		"msg":    {msg}})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer req.Body.Close()
+	resp, _ := ioutil.ReadAll(req.Body)
+	fmt.Println(string(resp))
 }
 
 func main() {
-  msgPtr := flag.String("msg", "", "string")
-  flag.Parse()
-  sendSms(*msgPtr)
+	msgPtr := flag.String("msg", "", "string")
+	flag.Parse()
+	sendSms(*msgPtr)
 }
-
-
